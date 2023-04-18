@@ -24,15 +24,22 @@ int main(int argc, char **argv) {
 
   // TODO: connect to server
 
-  int fd = Open_clientfd(argv[1], argv[2]);
+  int fd = open_clientfd(argv[1], argv[2]);
+
+  Connection* connection = new Connection(fd);
+
+  connection->connect(server_hostname, server_port);
 
   // TODO: send slogin message
-  char slogin[] = "slogin:";
-  Rio_writen(fd, strcat(slogin, argv[3]), strlen(argv[3]));
-  rio_writen(fd, "\n", 1);
+  Message* msg = new Message("slogin", argv[3]);
+  connection->send(*msg);
 
   // TODO: loop reading commands from user, sending messages to
   //       server as appropriate
+
+  while(connection->get_last_result() == Connection::SUCCESS){
+    
+  }
   
   rio_t rio; 
   rio_readinitb(&rio, fd);

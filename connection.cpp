@@ -21,7 +21,7 @@ Connection::Connection(int fd)
 
 void Connection::connect(const std::string &hostname, int port) {
   // TODO: call open_clientfd to connect to the server
-  int fd = Open_clientfd(hostname.c_str(), std::to_string(port).c_str());
+  int fd = open_clientfd(hostname.c_str(), std::to_string(port).c_str());
   
   // TODO: call rio_readinitb to initialize the rio_t object
   m_fd = fd;
@@ -30,7 +30,10 @@ void Connection::connect(const std::string &hostname, int port) {
 
 Connection::~Connection() {
   // TODO: close the socket if it is open
-  close();
+  if(is_open()){
+    close();
+  }
+  
 }
 
 bool Connection::is_open() const {
@@ -48,13 +51,42 @@ bool Connection::send(const Message &msg) {
   // TODO: send a message
   // return true if successful, false if not
   // make sure that m_last_result is set appropriately
-  Rio_writen(m_fd, msg.msg.c_str(), msg.datasize);
+  ssize_t bytes = rio_writen(m_fd, msg.msg.c_str(), msg.datasize);
+  if(bytes < msg.datasize){
+    m_last_result = EOF_OR_ERROR;
+    return false;
+  }
+  else{
+    m_last_result = SUCCESS;
+    return true;
+  }
+  
 }
 
 bool Connection::receive(Message &msg) {
   // TODO: receive a message, storing its tag and data in msg
   // return true if successful, false if not
   // make sure that m_last_result is set appropriately
-  Rio_readinitb(&m_fdbuf, m_fd);
+  char userbuf[msg.MAX_LEN + 1];
+  ssize_t bytes = rio_readnb(&m_fdbuf, (void *) userbuf, msg.datasize);
+  userbuf[msg.datasize] = 0;
+
+  if(bytes < msg.datasize){
+    m_last_result = EOF_OR_ERROR;
+    return false;
+  }
+  else{
+    std::string usrbf = std::string(userbuf);
+    size_t colonindex = usrbf.find(':');
+    if (colonindex == std::string::npos){
+      m_last_result = INVALID_MSG;
+      return false;
+    }
+    
+  }
+
+  //less than 256
+  //
+
   //m_fdbuf.rio_buf.find(':');
 }
