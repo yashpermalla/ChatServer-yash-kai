@@ -1,6 +1,7 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
+#include <cstring>
 #include <vector>
 #include <string>
 
@@ -13,11 +14,18 @@ struct Message {
 
   std::string tag;
   std::string data;
+  std::string msg;
+  int datasize;
 
   Message() { }
 
   Message(const std::string &tag, const std::string &data)
-    : tag(tag), data(data) { }
+    : tag(tag), data(data) { 
+      msg = tag + ":" + data;
+      datasize = msg.length();
+    }
+
+  
 
   // TODO: you could add helper functions
 };
