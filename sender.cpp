@@ -47,13 +47,11 @@ int main(int argc, char **argv) {
 
   // TODO: send slogin message
   msg.modify("slogin", argv[3]);
-  connection.send(msg);
-  if(connection.get_last_result() != Connection::SUCCESS){
+  if(!connection.send(msg)){
     std::cerr << "Failed to login!";
     exit(1);
   }
-  connection.receive(msg);
-  if(connection.get_last_result() != Connection::SUCCESS){
+  if(!connection.receive(msg)){
     std::cerr << "Failed to login!";
     exit(1);
   }

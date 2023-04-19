@@ -93,13 +93,11 @@ bool Connection::receive(Message &msg) {
 }
 
 bool Connection::client_server_comm(Message &msg){
-      send(msg);
-      if(get_last_result() != Connection::SUCCESS){
+      if(!send(msg)){
         std::cerr << "Failed to " << msg.tag << "!";
         return false;
       }
-      receive(msg);
-      if(get_last_result() != Connection::SUCCESS){
+      if(!receive(msg)){
         std::cerr << "Failed to " << msg.tag << "!";
         return false;
       }
