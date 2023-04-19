@@ -67,60 +67,27 @@ int main(int argc, char **argv) {
 
   while(std::getline(std::cin, sendinput)){
 
-    
-
     if(sendinput.substr(0, 5) == "/join"){
       msg.modify("join", sendinput.substr(6, sendinput.length() - 6));
-      connection.send(msg);
-      if(connection.get_last_result() != Connection::SUCCESS){
-        std::cerr << "Failed to join!";
-      }
-      connection.receive(msg);
-      if(msg.tag == "err"){
-        std::cerr << msg.data;
-      }
+      connection.client_server_comm(msg);
     }
     else if(sendinput.substr(0, 6) == "/leave"){
       msg.modify("leave", "");
-      connection.send(msg);
-      if(connection.get_last_result() != Connection::SUCCESS){
-        std::cerr << "Failed to leave!";
-      }
-      connection.receive(msg);
-      if(msg.tag == "err"){
-        std::cerr << msg.data;
-      }
+      connection.client_server_comm(msg);
     }
     else if(sendinput.substr(0, 6) == "/quit"){
       msg.modify("quit", "");
-      connection.send(msg);
-      if(connection.get_last_result() != Connection::SUCCESS){
-        std::cerr << "Failed to quit!";
-      }
-      connection.receive(msg);
-      if(msg.tag == "err"){
-        std::cerr << msg.data;
-      }
+      connection.client_server_comm(msg);
     }
     else if(sendinput[0] == '/'){
       std::cerr << "Invalid command!";
     }
     else{
       msg.modify("sendall", sendinput);
-      connection.send(msg);
-      if(connection.get_last_result() != Connection::SUCCESS){
-        std::cerr << "Failed to send!";
-      }
-      connection.receive(msg);
-      if(msg.tag == "err"){
-        std::cerr << msg.data;
-      }
+      connection.client_server_comm(msg);
     }
 
   }
-
-
-  
 
   return 0;
 }

@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <iostream>
 #include <sstream>
 #include <cctype>
 #include <cassert>
@@ -91,7 +92,17 @@ bool Connection::receive(Message &msg) {
   
 }
 
-bool Connection::client_server_comm(const Message &msg){
-
+bool Connection::client_server_comm(Message &msg){
+      send(msg);
+      if(get_last_result() != Connection::SUCCESS){
+        std::cerr << "Failed to " << msg.tag << "!";
+        return false;
+      }
+      receive(msg);
+      if(msg.tag == "err"){
+        std::cerr << msg.data;
+        return false;
+      }
+      return true;
 }
 
