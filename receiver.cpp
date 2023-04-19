@@ -23,31 +23,26 @@ int main(int argc, char **argv) {
 
   // connect to server
   conn.connect(server_hostname, server_port);
-
-  if(!conn.client_server_comm(msg)){
-    std::cerr << "Failed to connect!\n";
-    exit(1);
-  }
   
   // TODO: send rlogin and join messages (expect a response from
   //       the server for each one)
   msg = Message(TAG_RLOGIN, username);
 
   // rlogin messages
-  if (conn.client_server_comm(msg) || msg.tag != TAG_OK) { 
+  if (conn.client_server_comm(msg)) { 
     // register receiver thread with username
   } else {
-    std::cerr << "Failed to login!\n";
+    std::cerr << msg.msg;
     return 1; // Exit with non-zero code
   }
 
   msg = Message(TAG_JOIN , room_name);
 
   // join messages
-  if (conn.client_server_comm(msg) || msg.tag != TAG_OK) { 
+  if (conn.client_server_comm(msg)) { 
     // register receiver to room
   } else {
-    std::cerr << "Failed to join room!\n";
+    std::cerr << msg.msg;
     return 1; // Exit with non-zero code
   }
 
