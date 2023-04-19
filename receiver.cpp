@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
     
     std::string str = msg_loop.msg;
     size_t pos = str.find_last_of(":");
-    std::cout << str.substr(pos + 1, str.length());
+    std::cout << str.substr(pos + 1);
 
 
   }
