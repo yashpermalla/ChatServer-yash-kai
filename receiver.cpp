@@ -1,60 +1,95 @@
+#include <cstdio>
 #include <iostream>
 #include <string>
-#include <vector>
+#include <sstream>
 #include <stdexcept>
 #include "csapp.h"
 #include "message.h"
 #include "connection.h"
 #include "client_util.h"
 
+
 int main(int argc, char **argv) {
-  if (argc != 5) {
-    std::cerr << "Usage: ./receiver [server_address] [port] [username] [room]\n";
+
+  if (argc != 4) {
+    std::cerr << "Usage: ./sender [server_address] [port] [username]\n";
     return 1;
   }
 
-  std::string server_hostname = argv[1];
-  int server_port = std::stoi(argv[2]);
-  std::string username = argv[3];
-  std::string room_name = argv[4];
+  std::string server_hostname;
+  int server_port;
+  std::string username;
 
-  Connection conn;
-  Message msg;
+  server_hostname = argv[1];
+  server_port = std::stoi(argv[2]);
+  username = argv[3];
 
-  // connect to server
-  conn.connect(server_hostname, server_port);
-  
-  // TODO: send rlogin and join messages (expect a response from
-  //       the server for each one)
-  msg = Message(TAG_RLOGIN, username);
+  // TODO: connect to server
 
-  // rlogin messages
-  if (conn.client_server_comm(msg)) { 
-    // register receiver thread with username
-  } else {
-    return 1; // Exit with non-zero code
+  Connection connection;
+
+  connection.connect(server_hostname, server_port);
+
+  // expect an "ok" message
+  Message msg = Message(TAG_ERR, "");
+
+  if(!connection.receive(msg) || msg.tag != TAG_OK){
+    std::cerr << "Failed to connect!\n";
+    exit(1);
   }
 
-  msg = Message(TAG_JOIN , room_name);
-
-  // join messages
-  if (conn.client_server_comm(msg)) { 
-    // register receiver to room
-  } else {
-    return 1; // Exit with non-zero code
+  // TODO: send slogin message
+  msg.modify("slogin", argv[3]);
+  if(!connection.send(msg)){
+    std::cerr << "Failed to login!\n";
+    exit(1);
+  }
+  if(!connection.receive(msg)){
+    std::cerr << "Failed to login!\n";
+    exit(1);
+  }
+  if(msg.tag == "err"){
+    std::cerr << msg.data;
+    exit(1);
   }
 
-  std::string currentLine;
-  Message msg_loop = Message(TAG_DELIVERY, "");
-  
-  // TODO: loop waiting for messages from server
-  //       (which should be tagged with TAG_DELIVERY)
-  while (conn.receive(msg_loop) && msg_loop.tag == TAG_DELIVERY) {
-    
-    std::string str = msg_loop.msg;
-    size_t pos = str.find_last_of(":");
-    std::cout << str.substr(pos + 1) << std::endl;
 
+
+  // TODO: loop reading commands from user, sending messages to
+  //       server as appropriate
+
+  std::string sendinput;
+
+  //std::stringstream ss;
+
+  std::string command;
+
+  while(std::getline(std::cin, sendinput)){
+
+    if(sendinput.substr(0, 5) == "/join"){
+      msg.modify("join", rtrim(sendinput.substr(6)));
+      connection.client_server_comm(msg);
+    }
+    else if(sendinput.substr(0, 6) == "/leave"){
+      msg.modify("leave", "");
+      connection.client_server_comm(msg);
+    }
+    else if(sendinput.substr(0, 6) == "/quit"){
+      msg.modify("quit", "");
+      if(connection.client_server_comm(msg)){
+        exit(0);
+      }
+      else{
+        exit(1);
+      }
+    }
+    else if(sendinput[0] == '/'){
+      std::cerr << "Invalid command!\n";
+    }
+    else{
+      msg.modify("sendall", sendinput);
+      connection.client_server_comm(msg);
+    }
 
   }
 

@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
   connection.connect(server_hostname, server_port);
 
   // expect an "ok" message
-  Message msg = Message(TAG_ERR, "");
+  Message msg = Message(TAG_ERR, "\n");
 
   if(!connection.receive(msg) || msg.tag != TAG_OK){
     std::cerr << "Failed to connect!\n";
@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
   }
 
   // TODO: send slogin message
-  msg.modify("slogin", argv[3]);
+  msg.modify("slogin", std::string(argv[3]) + "\n");
   if(!connection.send(msg)){
     std::cerr << "Failed to login!\n";
     exit(1);
