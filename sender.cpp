@@ -8,7 +8,16 @@
 #include "connection.h"
 #include "client_util.h"
 
+
+
+bool sender_server(Connection &connection, ){
+  
+}
+
+
+
 int main(int argc, char **argv) {
+
   if (argc != 4) {
     std::cerr << "Usage: ./sender [server_address] [port] [username]\n";
     return 1;
@@ -24,33 +33,93 @@ int main(int argc, char **argv) {
 
   // TODO: connect to server
 
-  int fd = open_clientfd(argv[1], argv[2]);
+  Connection connection;
 
-  Connection* connection = new Connection(fd);
+  connection.connect(server_hostname, server_port);
 
-  connection->connect(server_hostname, server_port);
+  if(!connection.is_open()){
+    std::cerr << "Failed to connect!";
+    exit(1);
+  }
 
   // TODO: send slogin message
-  Message* msg = new Message("slogin", argv[3]);
-  connection->send(*msg);
+  Message msg("slogin", argv[3]);
+  connection.send(msg);
+  if(connection.get_last_result() != Connection::SUCCESS){
+    std::cerr << "Failed to login!";
+  }
+  connection.receive(msg);
+  if(msg.tag == "err"){
+    std::cerr << msg.data;
+    exit(1);
+  }
+
+
 
   // TODO: loop reading commands from user, sending messages to
   //       server as appropriate
 
-  while(connection->get_last_result() == Connection::SUCCESS){
-    
-  }
-  
-  rio_t rio; 
-  rio_readinitb(&rio, fd);
-  char buf[1000];
-  ssize_t n = rio_readlineb(&rio, buf, sizeof(buf));
+  std::string sendinput;
 
-  while(n > 0){
-    Rio_writen(fd, buf, strlen(buf));
-    rio_writen(fd, "\n", 1);
-    n = rio_readlineb(&rio, buf, sizeof(buf));
+  std::stringstream ss;
+
+  std::string command;
+
+  while(std::getline(std::cin, sendinput)){
+
+    
+
+    if(sendinput.substr(0, 5) == "/join"){
+      msg.modify("join", sendinput.substr(6, sendinput.length() - 6));
+      connection.send(msg);
+      if(connection.get_last_result() != Connection::SUCCESS){
+        std::cerr << "Failed to join!";
+      }
+      connection.receive(msg);
+      if(msg.tag == "err"){
+        std::cerr << msg.data;
+      }
+    }
+    else if(sendinput.substr(0, 6) == "/leave"){
+      msg.modify("leave", "");
+      connection.send(msg);
+      if(connection.get_last_result() != Connection::SUCCESS){
+        std::cerr << "Failed to leave!";
+      }
+      connection.receive(msg);
+      if(msg.tag == "err"){
+        std::cerr << msg.data;
+      }
+    }
+    else if(sendinput.substr(0, 6) == "/quit"){
+      msg.modify("quit", "");
+      connection.send(msg);
+      if(connection.get_last_result() != Connection::SUCCESS){
+        std::cerr << "Failed to quit!";
+      }
+      connection.receive(msg);
+      if(msg.tag == "err"){
+        std::cerr << msg.data;
+      }
+    }
+    else if(sendinput[0] == '/'){
+      std::cerr << "Invalid command!";
+    }
+    else{
+      msg.modify("sendall", sendinput);
+      connection.send(msg);
+      if(connection.get_last_result() != Connection::SUCCESS){
+        std::cerr << "Failed to send!";
+      }
+      connection.receive(msg);
+      if(msg.tag == "err"){
+        std::cerr << msg.data;
+      }
+    }
+
   }
+
+
   
 
   return 0;

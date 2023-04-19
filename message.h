@@ -25,7 +25,12 @@ struct Message {
       datasize = msg.length();
     }
 
-  
+  void modify(const std::string &tagin, const std::string &datain){
+    tag = tagin;
+    data = datain;
+    msg = tagin + ":" + datain;
+    datasize = msg.length();
+  }
 
   // TODO: you could add helper functions
 };

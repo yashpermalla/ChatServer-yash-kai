@@ -38,28 +38,28 @@ Connection::~Connection() {
 
 bool Connection::is_open() const {
   // TODO: return true if the connection is open
-  return (m_fd > -1);
+  return (m_fd > 0);
 }
 
 void Connection::close() {
   // TODO: close the connection if it is open
   Close(m_fd);
-  m_fd = -1;
 }
 
 bool Connection::send(const Message &msg) {
   // TODO: send a message
   // return true if successful, false if not
   // make sure that m_last_result is set appropriately
-  ssize_t bytes = rio_writen(m_fd, msg.msg.c_str(), msg.datasize);
-  if(bytes < msg.datasize){
-    m_last_result = EOF_OR_ERROR;
-    return false;
-  }
-  else{
-    m_last_result = SUCCESS;
-    return true;
-  }
+
+    ssize_t bytes = rio_writen(m_fd, msg.msg.c_str(), msg.datasize);
+    if(bytes < msg.datasize){
+      m_last_result = EOF_OR_ERROR;
+      return false;
+    }
+    else{
+      m_last_result = SUCCESS;
+      return true;
+    }
   
 }
 
@@ -68,8 +68,8 @@ bool Connection::receive(Message &msg) {
   // return true if successful, false if not
   // make sure that m_last_result is set appropriately
   char userbuf[msg.MAX_LEN + 1];
-  ssize_t bytes = rio_readnb(&m_fdbuf, (void *) userbuf, msg.datasize);
-  userbuf[msg.datasize] = 0;
+  ssize_t bytes = rio_readnb(&m_fdbuf, (void *) userbuf, msg.MAX_LEN);
+  userbuf[bytes] = 0;
 
   if(bytes < msg.datasize){
     m_last_result = EOF_OR_ERROR;
@@ -82,11 +82,16 @@ bool Connection::receive(Message &msg) {
       m_last_result = INVALID_MSG;
       return false;
     }
-    
+    else{
+      msg.modify(usrbf.substr(0, colonindex), usrbf.substr(colonindex+1, usrbf.length() - colonindex - 1));
+      m_last_result = SUCCESS;
+      return true;
+    }
   }
-
-  //less than 256
-  //
-
-  //m_fdbuf.rio_buf.find(':');
+  
 }
+
+bool Connection::client_server_comm(const Message &msg){
+
+}
+
