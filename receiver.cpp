@@ -28,25 +28,20 @@ int main(int argc, char **argv) {
   // TODO: send rlogin and join messages (expect a response from
   //       the server for each one)
   msg = Message(TAG_RLOGIN, username);
-  conn.send(msg);
 
   // rlogin messages
   if (conn.client_server_comm(msg)) { 
     // register receiver thread with username
   } else {
-    std::cerr << TAG_ERR << "Failed to connect to server";
     return 1; // Exit with non-zero code
   }
 
   msg = Message(TAG_JOIN , room_name);
-  conn.send(msg);
 
   // join messages
   if (conn.client_server_comm(msg)) { 
     // register receiver to room
-
   } else {
-    std::cerr << TAG_ERR << "Failed to join the room";
     return 1; // Exit with non-zero code
   }
 
