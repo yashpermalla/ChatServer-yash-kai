@@ -50,8 +50,13 @@ int main(int argc, char **argv) {
   connection.send(msg);
   if(connection.get_last_result() != Connection::SUCCESS){
     std::cerr << "Failed to login!";
+    exit(1);
   }
   connection.receive(msg);
+  if(connection.get_last_result() != Connection::SUCCESS){
+    std::cerr << "Failed to login!";
+    exit(1);
+  }
   if(msg.tag == "err"){
     std::cerr << msg.data;
     exit(1);
@@ -71,7 +76,7 @@ int main(int argc, char **argv) {
   while(std::getline(std::cin, sendinput)){
 
     if(sendinput.substr(0, 5) == "/join"){
-      msg.modify("join", sendinput.substr(6));
+      msg.modify("join", rtrim(sendinput.substr(6)));
       connection.client_server_comm(msg);
     }
     else if(sendinput.substr(0, 6) == "/leave"){
@@ -80,7 +85,12 @@ int main(int argc, char **argv) {
     }
     else if(sendinput.substr(0, 6) == "/quit"){
       msg.modify("quit", "");
-      connection.client_server_comm(msg);
+      if(connection.client_server_comm(msg)){
+        exit(0);
+      }
+      else{
+        exit(1);
+      }
     }
     else if(sendinput[0] == '/'){
       std::cerr << "Invalid command!";
