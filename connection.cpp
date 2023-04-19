@@ -102,7 +102,7 @@ bool Connection::client_server_comm(Message &msg){
         return false;
       }
       if(msg.tag == "err"){
-        std::cerr << msg.data;
+        std::cerr << msg.data << std::endl;
         return false;
       }
       return true;
