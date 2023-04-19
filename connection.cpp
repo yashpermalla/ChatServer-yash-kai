@@ -99,6 +99,10 @@ bool Connection::client_server_comm(Message &msg){
         return false;
       }
       receive(msg);
+      if(get_last_result() != Connection::SUCCESS){
+        std::cerr << "Failed to " << msg.tag << "!";
+        return false;
+      }
       if(msg.tag == "err"){
         std::cerr << msg.data;
         return false;
