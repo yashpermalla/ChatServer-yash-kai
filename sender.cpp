@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 
   // TODO: send slogin message
   msg.modify("slogin", std::string(argv[3]) + "\n");
-  if(connection.client_server_comm(msg) || msg.tag != TAG_OK){
+  if(!connection.client_server_comm(msg) || msg.tag != TAG_OK){
     std::cerr << "Failed to login!\n";
     exit(1);
   }

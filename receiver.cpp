@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
   msg = Message(TAG_RLOGIN, username);
 
   // rlogin messages
-  if (conn.client_server_comm(msg)) { 
+  if (!conn.client_server_comm(msg)) { 
     // register receiver thread with username
   } else {
     std::cerr << msg.msg;
@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
   msg = Message(TAG_JOIN , room_name);
 
   // join messages
-  if (conn.client_server_comm(msg)) { 
+  if (!conn.client_server_comm(msg)) { 
     // register receiver to room
   } else {
     std::cerr << msg.msg;
