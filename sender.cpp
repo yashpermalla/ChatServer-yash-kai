@@ -25,35 +25,23 @@ int main(int argc, char **argv) {
   username = argv[3];
 
   // TODO: connect to server
-
   Connection connection;
-
   connection.connect(server_hostname, server_port);
 
   // expect an "ok" message
   Message msg = Message(TAG_ERR, "");
 
-  if(!connection.receive(msg) || msg.tag != TAG_OK){
+  if(!connection.client_server_comm(msg) || msg.tag != TAG_OK){
     std::cerr << "Failed to connect!\n";
     exit(1);
   }
 
   // TODO: send slogin message
   msg.modify("slogin", argv[3]);
-  if(!connection.send(msg)){
+  if(connection.client_server_comm(msg) || msg.tag != TAG_OK){
     std::cerr << "Failed to login!\n";
     exit(1);
   }
-  if(!connection.receive(msg)){
-    std::cerr << "Failed to login!\n";
-    exit(1);
-  }
-  if(msg.tag == "err"){
-    std::cerr << msg.data;
-    exit(1);
-  }
-
-
 
   // TODO: loop reading commands from user, sending messages to
   //       server as appropriate
