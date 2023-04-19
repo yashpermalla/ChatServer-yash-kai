@@ -61,14 +61,14 @@ int main(int argc, char **argv) {
 
   std::string sendinput;
 
-  std::stringstream ss;
+  //std::stringstream ss;
 
   std::string command;
 
   while(std::getline(std::cin, sendinput)){
 
     if(sendinput.substr(0, 5) == "/join"){
-      msg.modify("join", sendinput.substr(6, sendinput.length() - 6));
+      msg.modify("join", sendinput.substr(6));
       connection.client_server_comm(msg);
     }
     else if(sendinput.substr(0, 6) == "/leave"){

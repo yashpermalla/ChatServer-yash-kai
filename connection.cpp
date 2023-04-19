@@ -84,7 +84,7 @@ bool Connection::receive(Message &msg) {
       return false;
     }
     else{
-      msg.modify(usrbf.substr(0, colonindex), usrbf.substr(colonindex+1, usrbf.length() - colonindex - 1));
+      msg.modify(usrbf.substr(0, colonindex), usrbf.substr(colonindex+1));
       m_last_result = SUCCESS;
       return true;
     }
