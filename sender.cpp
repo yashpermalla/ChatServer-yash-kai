@@ -9,13 +9,6 @@
 #include "client_util.h"
 
 
-
-bool sender_server(Connection &connection, ){
-  
-}
-
-
-
 int main(int argc, char **argv) {
 
   if (argc != 4) {

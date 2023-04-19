@@ -19,7 +19,6 @@ int main(int argc, char **argv) {
   std::string room_name = argv[4];
 
   Connection conn;
-  rio_t rio;
   Message msg;
 
   // connect to server
