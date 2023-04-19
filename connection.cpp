@@ -69,7 +69,7 @@ bool Connection::receive(Message &msg) {
   // return true if successful, false if not
   // make sure that m_last_result is set appropriately
   char userbuf[msg.MAX_LEN + 1];
-  ssize_t bytes = rio_readnb(&m_fdbuf, (void *) userbuf, msg.MAX_LEN);
+  ssize_t bytes = rio_readlineb(&m_fdbuf, (void *) userbuf, msg.MAX_LEN);
   userbuf[bytes] = 0;
 
   if(bytes < msg.datasize){
