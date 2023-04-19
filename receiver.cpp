@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
   if (!conn.client_server_comm(msg)) { 
     // register receiver thread with username
   } else {
-    std::cerr << msg.msg;
+    std::cerr << "Failed to connect!\n";
     return 1; // Exit with non-zero code
   }
 
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
   if (!conn.client_server_comm(msg)) { 
     // register receiver to room
   } else {
-    std::cerr << msg.msg;
+    std::cerr << "Failed to join room!\n";
     return 1; // Exit with non-zero code
   }
 
