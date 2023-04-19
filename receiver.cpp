@@ -20,6 +20,7 @@ int main(int argc, char **argv) {
 
   Connection conn;
   rio_t rio;
+  Message msg;
 
 
   // connect to server
@@ -27,8 +28,8 @@ int main(int argc, char **argv) {
   
   // TODO: send rlogin and join messages (expect a response from
   //       the server for each one)
-  Message* msg = new Message(TAG_RLOGIN, username);
-  conn.send(*msg);
+  msg = Message(TAG_RLOGIN, username);
+  conn.send(msg);
 
   // expect an "ok" message
   Message msg3 = Message(TAG_OK, "You're in!");
@@ -37,30 +38,30 @@ int main(int argc, char **argv) {
   if (conn.receive(msg3)) { 
     // register receiver thread with username
   } else {
-    Message* msg = new Message(TAG_ERR, "Failed to connect to server");
-    Rio_writen(STDERR_FILENO, msg->msg.c_str(), msg->datasize);
+    msg = Message(TAG_ERR, "Failed to connect to server");
+    Rio_writen(STDERR_FILENO, msg.msg.c_str(), msg.datasize);
     return 1; // Exit with non-zero code
   }
 
-  Message* msg1 = new Message(TAG_JOIN , room_name);
-  conn.send(*msg1);
+  msg = Message(TAG_JOIN , room_name);
+  conn.send(msg);
 
   // join messages
   if (conn.receive(msg3)) { 
     // register receiver to room
     
   } else {
-    Message* msg1 = new Message(TAG_ERR, "Failed to join the room");
-    Rio_writen(STDERR_FILENO, msg1->msg.c_str(), msg1->datasize);
+    msg = Message(TAG_ERR, "Failed to join the room");
+    Rio_writen(STDERR_FILENO, msg.msg.c_str(), msg.datasize);
     return 1; // Exit with non-zero code
   }
 
   std::string currentLine;
-  //Message msg_loop = Message(TAG_DELIVERY);
+  Message msg_loop = Message(TAG_DELIVERY, "");
   
   // TODO: loop waiting for messages from server
   //       (which should be tagged with TAG_DELIVERY)
-  while (conn.get_last_result() == conn.SUCCESS) {
+  while (conn.receive(msg_loop) && msg_loop.tag == TAG_DELIVERY) {
     
     std::getline(std::cin, currentLine);
     std::cout << currentLine; 
