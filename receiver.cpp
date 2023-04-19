@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
   
   // TODO: send rlogin and join messages (expect a response from
   //       the server for each one)
-  msg = Message(TAG_RLOGIN, username);
+  msg = Message(TAG_RLOGIN, username + "\n");
 
   // rlogin messages
   if (conn.client_server_comm(msg)) { 
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     return 1; // Exit with non-zero code
   }
 
-  msg = Message(TAG_JOIN , room_name);
+  msg = Message(TAG_JOIN , room_name + "\n");
 
   // join messages
   if (conn.client_server_comm(msg)) { 
@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
     
     std::string str = msg_loop.msg;
     size_t pos = str.find_last_of(":");
-    std::cout << str.substr(pos + 1);
+    std::cout << str.substr(pos + 1) << std::endl;
 
 
   }
