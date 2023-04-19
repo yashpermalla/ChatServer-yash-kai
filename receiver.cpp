@@ -26,21 +26,23 @@ int main(int argc, char **argv) {
   
   // TODO: send rlogin and join messages (expect a response from
   //       the server for each one)
-  msg = Message(TAG_RLOGIN, username + "\n");
+  msg = Message(TAG_RLOGIN, username);
 
   // rlogin messages
   if (conn.client_server_comm(msg)) { 
     // register receiver thread with username
   } else {
+    std::cerr << msg.msg;
     return 1; // Exit with non-zero code
   }
 
-  msg = Message(TAG_JOIN , room_name + "\n");
+  msg = Message(TAG_JOIN , room_name);
 
   // join messages
   if (conn.client_server_comm(msg)) { 
     // register receiver to room
   } else {
+    std::cerr << msg.msg;
     return 1; // Exit with non-zero code
   }
 
@@ -53,8 +55,7 @@ int main(int argc, char **argv) {
     
     std::string str = msg_loop.msg;
     size_t pos = str.find_last_of(":");
-    std::cout << str.substr(pos + 1);
-
+    std::cout << username << ": " << str.substr(pos + 1);
 
   }
 
