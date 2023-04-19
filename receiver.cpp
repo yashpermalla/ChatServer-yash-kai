@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
   
   // TODO: send rlogin and join messages (expect a response from
   //       the server for each one)
-  msg = Message(TAG_RLOGIN, username);
+  msg = Message(TAG_RLOGIN, username + "\n");
 
   // rlogin messages
   if (!conn.client_server_comm(msg)) { 
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
     return 1; // Exit with non-zero code
   }
 
-  msg = Message(TAG_JOIN , room_name);
+  msg = Message(TAG_JOIN , room_name + "\n");
 
   // join messages
   if (!conn.client_server_comm(msg)) { 
@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
   }
 
   std::string currentLine;
-  Message msg_loop = Message(TAG_DELIVERY, "");
+  Message msg_loop = Message(TAG_ERR, "");
   
   // TODO: loop waiting for messages from server
   //       (which should be tagged with TAG_DELIVERY)
@@ -51,9 +51,14 @@ int main(int argc, char **argv) {
     
     std::string str = msg_loop.msg;
     size_t pos = str.find_last_of(":");
-    std::cout << username << ": " << str.substr(pos + 1);
+
+    std::string sub = str.substr(0, pos);
+    size_t pos1 = sub.find_last_of(":");
+
+
+    std::cout << str.substr(pos1 + 1, pos - pos1 - 1) << ": " << str.substr(pos + 1);
 
   }
-
+ 
   return 0;
 }
