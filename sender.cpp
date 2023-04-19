@@ -50,15 +50,15 @@ int main(int argc, char **argv) {
   while(std::getline(std::cin, sendinput)){
 
     if(sendinput.substr(0, 5) == "/join"){
-      msg.modify("join", rtrim(sendinput.substr(6)));
+      msg.modify("join", rtrim(sendinput.substr(6)) + "\n");
       connection.client_server_comm(msg);
     }
     else if(sendinput.substr(0, 6) == "/leave"){
-      msg.modify("leave", "");
+      msg.modify("leave", "\n");
       connection.client_server_comm(msg);
     }
     else if(sendinput.substr(0, 6) == "/quit"){
-      msg.modify("quit", "");
+      msg.modify("quit", "\n");
       if(connection.client_server_comm(msg)){
         exit(0);
       }
@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
       std::cerr << "Invalid command!\n";
     }
     else{
-      msg.modify("sendall", sendinput);
+      msg.modify("sendall", sendinput + "\n");
       connection.client_server_comm(msg);
     }
 
