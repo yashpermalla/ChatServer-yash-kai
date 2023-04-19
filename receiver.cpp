@@ -63,8 +63,10 @@ int main(int argc, char **argv) {
   //       (which should be tagged with TAG_DELIVERY)
   while (conn.receive(msg_loop) && msg_loop.tag == TAG_DELIVERY) {
     
-    std::getline(std::cin, currentLine);
-    std::cout << currentLine; 
+    std::string str = msg_loop.msg;
+    size_t pos = str.find_last_of(":");
+    std::cout << str.substr(pos + 1, str.length());
+
 
   }
 
