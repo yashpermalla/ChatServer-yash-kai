@@ -22,7 +22,6 @@ int main(int argc, char **argv) {
   rio_t rio;
   Message msg;
 
-
   // connect to server
   conn.connect(server_hostname, server_port);
   
@@ -31,15 +30,11 @@ int main(int argc, char **argv) {
   msg = Message(TAG_RLOGIN, username);
   conn.send(msg);
 
-  // expect an "ok" message
-  Message msg3 = Message(TAG_OK, "You're in!");
-
   // rlogin messages
-  if (conn.receive(msg3)) { 
+  if (conn.client_server_comm(msg)) { 
     // register receiver thread with username
   } else {
-    msg = Message(TAG_ERR, "Failed to connect to server");
-    Rio_writen(STDERR_FILENO, msg.msg.c_str(), msg.datasize);
+    std::cerr << TAG_ERR << "Failed to connect to server";
     return 1; // Exit with non-zero code
   }
 
@@ -47,12 +42,11 @@ int main(int argc, char **argv) {
   conn.send(msg);
 
   // join messages
-  if (conn.receive(msg3)) { 
+  if (conn.client_server_comm(msg)) { 
     // register receiver to room
-    
+
   } else {
-    msg = Message(TAG_ERR, "Failed to join the room");
-    Rio_writen(STDERR_FILENO, msg.msg.c_str(), msg.datasize);
+    std::cerr << TAG_ERR << "Failed to join the room";
     return 1; // Exit with non-zero code
   }
 
