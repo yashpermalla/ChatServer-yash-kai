@@ -41,18 +41,18 @@ int main(int argc, char **argv) {
   Message msg = Message(TAG_ERR, "");
 
   if(!connection.receive(msg) || msg.tag != TAG_OK){
-    std::cerr << "Failed to connect!";
+    std::cerr << "Failed to connect!\n";
     exit(1);
   }
 
   // TODO: send slogin message
   msg.modify("slogin", argv[3]);
   if(!connection.send(msg)){
-    std::cerr << "Failed to login!";
+    std::cerr << "Failed to login!\n";
     exit(1);
   }
   if(!connection.receive(msg)){
-    std::cerr << "Failed to login!";
+    std::cerr << "Failed to login!\n";
     exit(1);
   }
   if(msg.tag == "err"){
@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
       }
     }
     else if(sendinput[0] == '/'){
-      std::cerr << "Invalid command!";
+      std::cerr << "Invalid command!\n";
     }
     else{
       msg.modify("sendall", sendinput);

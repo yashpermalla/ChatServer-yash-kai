@@ -94,11 +94,11 @@ bool Connection::receive(Message &msg) {
 
 bool Connection::client_server_comm(Message &msg){
       if(!send(msg)){
-        std::cerr << "Failed to " << msg.tag << "!";
+        std::cerr << "Failed to " << msg.tag << "!\n";
         return false;
       }
       if(!receive(msg)){
-        std::cerr << "Failed to " << msg.tag << "!";
+        std::cerr << "Failed to " << msg.tag << "!\n";
         return false;
       }
       if(msg.tag == "err"){
