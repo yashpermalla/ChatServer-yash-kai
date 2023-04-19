@@ -37,7 +37,10 @@ int main(int argc, char **argv) {
 
   connection.connect(server_hostname, server_port);
 
-  if(!connection.is_open()){
+  // expect an "ok" message
+  Message msg = Message(TAG_OK, "You're in!");
+
+  if(!connection.receive(msg)){
     std::cerr << "Failed to connect!";
     exit(1);
   }
