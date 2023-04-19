@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
   // connect to server
   conn.connect(server_hostname, server_port);
 
-  if(!conn.client_server_comm(msg) || msg.tag != TAG_OK){
+  if(!conn.client_server_comm(msg)){
     std::cerr << "Failed to connect!\n";
     exit(1);
   }
