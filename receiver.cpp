@@ -23,6 +23,9 @@ int main(int argc, char **argv) {
 
   // connect to server
   conn.connect(server_hostname, server_port);
+  if(!conn.is_open()){
+    std::cerr << "Failed to connect to server!";
+  }
   
   // TODO: send rlogin and join messages (expect a response from
   //       the server for each one)
@@ -47,16 +50,21 @@ int main(int argc, char **argv) {
   
   // TODO: loop waiting for messages from server
   //       (which should be tagged with TAG_DELIVERY)
-  while (conn.receive(msg_loop) && msg_loop.tag == TAG_DELIVERY) {
+  while (conn.receive(msg_loop)) {
     
-    std::string str = msg_loop.msg;
-    size_t pos = str.find_last_of(":");
+    if(msg_loop.tag == TAG_DELIVERY){
+      std::string str = msg_loop.msg;
+      size_t pos = str.find_last_of(":");
 
-    std::string sub = str.substr(0, pos);
-    size_t pos1 = sub.find_last_of(":");
+      std::string sub = str.substr(0, pos);
+      size_t pos1 = sub.find_last_of(":");
 
-
-    std::cout << str.substr(pos1 + 1, pos - pos1 - 1) << ": " << str.substr(pos + 1);
+      std::cout << str.substr(pos1 + 1, pos - pos1 - 1) << ": " << str.substr(pos + 1);
+    }
+    else if(msg_loop.tag == TAG_ERR){
+      std::cerr << msg.data;
+    }
+    
 
   }
  
