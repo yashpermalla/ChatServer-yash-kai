@@ -43,6 +43,8 @@ public:
 
   Result get_last_result() const { return m_last_result; }
 
+  // Helper method to handle send/receive calls along
+  // with checking for err handles
   bool client_server_comm(Message &msg);
 
 private:

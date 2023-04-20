@@ -25,14 +25,15 @@ struct Message {
       datasize = msg.length();
     }
 
+  // Helper function to modify the tag and data of a Message object
   void modify(const std::string &tagin, const std::string &datain){
+    // Store new tag and data along with our wanted format
     tag = tagin;
     data = datain;
     msg = tagin + ":" + datain;
     datasize = msg.length();
   }
 
-  // TODO: you could add helper functions
 };
 
 // standard message tags (note that you don't need to worry about
