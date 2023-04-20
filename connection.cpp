@@ -101,7 +101,7 @@ bool Connection::client_server_comm(Message &msg){
       //std::cerr << "send worked";
 
       if(!receive(msg)){
-        std::cerr << "Failed to " << msg.tag << "!\n";
+        std::cerr << "Failed to " << "receive from server!\n";
         return false;
       }
 
