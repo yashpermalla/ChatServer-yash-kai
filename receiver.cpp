@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 
   // rlogin messages
   if (!conn.client_server_comm(msg)) { 
-    std::cerr << "Failed to connect!\n";
+    //std::cerr << "Failed to connect!\n";
     return 1; // Exit with non-zero code
   }
 
@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
 
   // join messages
   if (!conn.client_server_comm(msg)) { 
-    std::cerr << "Failed to join room!\n";
+    //std::cerr << "Failed to join room!\n";
     return 1; // Exit with non-zero code
   }
 

@@ -108,7 +108,7 @@ bool Connection::client_server_comm(Message &msg){
       //std::cerr << "receive worked";
 
       if(msg.tag == "err"){
-        std::cerr << msg.data << std::endl;
+        std::cerr << msg.data;
         return false;
       }
       return true;
