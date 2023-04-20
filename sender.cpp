@@ -30,6 +30,7 @@ int main(int argc, char **argv) {
   connection.connect(server_hostname, server_port);
   if(!connection.is_open()){
     std::cerr << "Failed to connect to server!";
+    exit(1);
   }
 
   // initialize message to err

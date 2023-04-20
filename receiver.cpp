@@ -27,6 +27,7 @@ int main(int argc, char **argv) {
   conn.connect(server_hostname, server_port);
   if(!conn.is_open()){
     std::cerr << "Failed to connect to server!";
+    exit(1);
   }
   
   // send rlogin and join messages (expect a response from
