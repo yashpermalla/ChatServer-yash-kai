@@ -41,34 +41,34 @@ void sender_comm(Connection* cn, Server* server, std::string username){
     if(msg.tag == TAG_JOIN){
       room = msg.data;
       server->find_or_create_room(msg.data);
-      msg.modify(TAG_OK, "joined");
+      msg.modify(TAG_OK, "joined\n");
       cn->send(msg);
     }
     else if(msg.tag == TAG_LEAVE){
       if(room == ""){
-        msg.modify(TAG_ERR, "You are not in a room!");
+        msg.modify(TAG_ERR, "You are not in a room!\n");
         cn->send(msg);
       }
       else{
         room = "";
-        msg.modify(TAG_OK, "Left room!");
+        msg.modify(TAG_OK, "Left room!\n");
         cn->send(msg);
       }
     }
     else if(msg.tag == TAG_QUIT){
       room = "";
-      msg.modify(TAG_OK, "Quit user");
+      msg.modify(TAG_OK, "Quit user\n");
       cn->send(msg);
       break;
     }
     else if(msg.tag == TAG_SENDALL){
       if(room == ""){
-        msg.modify(TAG_ERR, "You are not in a room!");
+        msg.modify(TAG_ERR, "You are not in a room!\n");
         cn->send(msg);
       }
       else{
         server->find_or_create_room(room)->broadcast_message(username, msg.data);
-        msg.modify(TAG_OK, "Sent!");
+        msg.modify(TAG_OK, "Sent!\n");
         cn->send(msg);
       }
     }
