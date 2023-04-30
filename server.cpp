@@ -90,10 +90,6 @@ void receiver_comm(Connection* cn, User* user, std::string room){
       
       if (!sent) {
 
-        while(!user->mqueue.is_empty()){
-          delete user->mqueue.dequeue();
-        }
-
         break;
       }
     }

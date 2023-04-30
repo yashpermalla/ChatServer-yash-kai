@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include "guard.h"
+#include "message.h"
 #include "message_queue.h"
 
 
@@ -16,6 +17,10 @@ MessageQueue::~MessageQueue() {
   // TODO: destroy the mutex and the semaphore
   pthread_mutex_destroy(&m_lock);
   sem_destroy(&m_avail);
+
+  while(!is_empty()){
+    delete dequeue();
+  }
   
 }
 
