@@ -4,6 +4,10 @@
 #include <map>
 #include <string>
 #include <pthread.h>
+#include "connection.h"
+#include "user.h"
+
+
 class Room;
 
 class Server {
@@ -17,6 +21,8 @@ public:
 
   Room *find_or_create_room(const std::string &room_name);
 
+
+
 private:
   // prohibit value semantics
   Server(const Server &);
@@ -28,7 +34,10 @@ private:
   // the server operations
   int m_port;
   int m_ssock;
+
   RoomMap m_rooms;
+
+
   pthread_mutex_t m_lock;
 };
 

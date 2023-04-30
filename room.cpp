@@ -3,7 +3,8 @@
 #include "message_queue.h"
 #include "user.h"
 #include "room.h"
-
+#include <iostream>
+#include "client_util.h" 
 
 Room::Room(const std::string &room_name)
   : room_name(room_name) {
@@ -31,10 +32,15 @@ void Room::remove_member(User *user) {
 }
 
 void Room::broadcast_message(const std::string &sender_username, const std::string &message_text) {
+
+  
+
   // send a message to every (receiver) User in the room
   Guard g(lock);
+
+
   for (User* user : members) {
-    std::string payload = room_name + ":" + sender_username + ":" + message_text;
+    std::string payload = trim(room_name) + ":" + trim(sender_username) + ":" + message_text;
     Message* msg = new Message(TAG_DELIVERY, payload);
     user->mqueue.enqueue(msg);
   }

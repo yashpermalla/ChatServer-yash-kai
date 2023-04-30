@@ -12,6 +12,7 @@
 #include "room.h"
 #include "guard.h"
 #include "server.h"
+#include "client_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Server implementation data types
@@ -33,7 +34,7 @@ struct server_help {
 namespace {
 
 void sender_comm(Connection* cn, Server* server, std::string username){
-  
+
   Message msg;
   std::string room = "";
   while(cn->receive(msg)){
@@ -46,29 +47,30 @@ void sender_comm(Connection* cn, Server* server, std::string username){
     }
     else if(msg.tag == TAG_LEAVE){
       if(room == ""){
-        msg.modify(TAG_ERR, "You are not in a room!\n");
+        msg.modify(TAG_ERR, "you are not in a room!\n");
         cn->send(msg);
       }
       else{
         room = "";
-        msg.modify(TAG_OK, "Left room!\n");
+        msg.modify(TAG_OK, "left room!\n");
         cn->send(msg);
       }
     }
     else if(msg.tag == TAG_QUIT){
       room = "";
-      msg.modify(TAG_OK, "Quit user\n");
+      msg.modify(TAG_OK, "quit user\n");
       cn->send(msg);
       break;
     }
     else if(msg.tag == TAG_SENDALL){
       if(room == ""){
-        msg.modify(TAG_ERR, "You are not in a room!\n");
+        msg.modify(TAG_ERR, "you are not in a room!\n");
         cn->send(msg);
       }
       else{
+
         server->find_or_create_room(room)->broadcast_message(username, msg.data);
-        msg.modify(TAG_OK, "Sent!\n");
+        msg.modify(TAG_OK, "sent!\n");
         cn->send(msg);
       }
     }
@@ -81,6 +83,7 @@ void receiver_comm(Connection* cn, User* user, std::string room){
   while (1) {
     Message* msg = user->mqueue.dequeue();
     if (msg != nullptr) {
+
       bool sent = cn->send(*msg);
 
       delete msg;
@@ -101,6 +104,8 @@ void receiver_comm(Connection* cn, User* user, std::string room){
 void *worker(void *arg) {
   pthread_detach(pthread_self());
 
+  
+
   // TODO: use a static cast to convert arg from a void* to
   //       whatever pointer type describes the object(s) needed
   //       to communicate with a client (sender or receiver)
@@ -112,9 +117,12 @@ void *worker(void *arg) {
   new_arg->connect->receive(read);
 
   bool sender = (read.tag == TAG_SLOGIN);
+  std::string username = read.data;
 
   read.modify(TAG_OK, "logged in\n");
   new_arg->connect->send(read);
+
+  
   
   // TODO: depending on whether the client logged in as a sender or
   //       receiver, communicate with the client (implementing
@@ -122,18 +130,28 @@ void *worker(void *arg) {
   //       is a good idea)
   if (sender) {
 
-    sender_comm(new_arg->connect, new_arg->server, read.data);
+    sender_comm(new_arg->connect, new_arg->server, username);
+
+    
     
   } else {
     
-    User* user = new User(read.data);
+    User* user = new User(username);
+
+     
+
     new_arg->connect->receive(read);
     if (read.tag == TAG_JOIN) {
       std::string room_name = read.data;
       read = Message(TAG_OK, "You joined " + room_name);
       new_arg->connect->send(read);
       (new_arg->server->find_or_create_room(room_name))->add_member(user);
+
+
       receiver_comm(new_arg->connect, user, room_name);
+
+
+
       (new_arg->server->find_or_create_room(room_name))->remove_member(user);
       delete user;
     }
@@ -200,9 +218,8 @@ Room *Server::find_or_create_room(const std::string &room_name) {
   // case where the room doesn't exist
   // RoomMap::iterator it = m_rooms.find(room_name);
   if (m_rooms.count(room_name) == 0) {
-    return new Room(room_name);
-  } else {
-    return m_rooms[room_name];
+    m_rooms[room_name] = new Room(room_name);
   }
+    return m_rooms[room_name];
 
 }
