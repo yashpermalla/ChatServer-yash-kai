@@ -22,6 +22,10 @@ public:
 
   void broadcast_message(const std::string &sender_username, const std::string &message_text);
 
+  bool in_room(User* user){
+    return (members.find(user) != members.end());
+  }
+
 private:
   std::string room_name;
   pthread_mutex_t lock;

@@ -1,4 +1,4 @@
-x#include <cassert>
+#include <cassert>
 #include <ctime>
 #include <pthread.h>
 #include <semaphore.h>
@@ -16,6 +16,7 @@ MessageQueue::~MessageQueue() {
   // TODO: destroy the mutex and the semaphore
   pthread_mutex_destroy(&m_lock);
   sem_destroy(&m_avail);
+  
 }
 
 void MessageQueue::enqueue(Message *msg) {
@@ -53,11 +54,9 @@ Message *MessageQueue::dequeue() {
   // TODO: remove the next message from the queue, return it
   
   Message *msg = nullptr;
-  {
-    Guard g(m_lock);
-    msg = m_messages.front();
-    m_messages.pop_front();
-  }
   
+  Guard g(m_lock);
+  msg = m_messages.front();
+  m_messages.pop_front();
   return msg;
 }

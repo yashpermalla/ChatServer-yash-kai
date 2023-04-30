@@ -34,7 +34,8 @@ void Room::broadcast_message(const std::string &sender_username, const std::stri
   // send a message to every (receiver) User in the room
   Guard g(lock);
   for (User* user : members) {
-    Message* msg = new Message(sender_username, message_text);
+    std::string payload = room_name + ":" + sender_username + ":" + message_text;
+    Message* msg = new Message(TAG_DELIVERY, payload);
     user->mqueue.enqueue(msg);
   }
   // Note: should unlock when Guard goes out-of-scope!

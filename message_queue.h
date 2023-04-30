@@ -16,6 +16,8 @@ public:
   void enqueue(Message *msg); // will not block
   Message *dequeue();         // blocks for at most a finite amount of time
 
+  bool is_empty(){ return m_messages.empty(); }
+
 private:
   // value semantics prohibited
   MessageQueue(const MessageQueue &);
