@@ -127,9 +127,10 @@ void *worker(void *arg) {
   } else {
     
     User* user = new User(read.data);
+    new_arg->connect->receive(read);
     if (read.tag == TAG_JOIN) {
       std::string room_name = read.data;
-      read = Message(TAG_OK, "You joined " + room_name + "\n");
+      read = Message(TAG_OK, "You joined " + room_name);
       new_arg->connect->send(read);
       receiver_comm(new_arg->connect, user, room_name);
     }
