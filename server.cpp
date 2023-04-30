@@ -132,7 +132,10 @@ void *worker(void *arg) {
       std::string room_name = read.data;
       read = Message(TAG_OK, "You joined " + room_name);
       new_arg->connect->send(read);
+      (new_arg->server->find_or_create_room(room_name))->add_member(user);
       receiver_comm(new_arg->connect, user, room_name);
+      (new_arg->server->find_or_create_room(room_name))->remove_member(user);
+      delete user;
     }
   }
   
