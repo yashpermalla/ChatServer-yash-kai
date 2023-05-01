@@ -78,7 +78,7 @@ bool Connection::receive(Message &msg) {
     std::string usrbf = std::string(userbuf);
     size_t colonindex = usrbf.find(":");
     // Cannot find colon char value
-    if (colonindex == std::string::npos || msg.datasize > (int) Message::MAX_LEN){
+    if (colonindex == std::string::npos || usrbf.length() > (int) Message::MAX_LEN){
       m_last_result = INVALID_MSG;
       return false;
     }
