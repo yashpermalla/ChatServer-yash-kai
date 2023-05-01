@@ -98,6 +98,13 @@ void sender_comm(Connection* cn, Server* server, std::string username){
         }
       }
     }
+    else{
+      //tag does not match protocol
+      msg.modify(TAG_ERR, "Invalid tag\n");
+      if(!cn->send(msg)){
+        break;
+      }
+    }
   }
 }
 
@@ -179,53 +186,45 @@ void *worker(void *arg) {
   //       separate helper functions for each of these possibilities
   //       is a good idea)
   if (sender) {
-
     sender_comm(new_arg->connect, new_arg->server, username);
-
-    
-    
   } else {
-    
     User* user = new User(username);
-
-     
-
     new_arg->connect->receive(read);
 
-    if(new_arg->connect->get_last_result() == Connection::INVALID_MSG){
-      Message msg(TAG_ERR, "Invalid message\n");
-      new_arg->connect->send(msg);
-      delete new_arg->connect;
-      free(arg);
-      return nullptr;
-      
+    while(read.tag != TAG_JOIN){
+      if(new_arg->connect->get_last_result() == Connection::INVALID_MSG){
+        Message msg(TAG_ERR, "Invalid message\n");
+        if(!new_arg->connect->send(msg)){
+          delete new_arg->connect;
+          free(arg);
+          return nullptr;
+        }
+      }
+      else if(new_arg->connect->get_last_result() == Connection::EOF_OR_ERROR){
+        delete new_arg->connect;
+        free(arg);
+        return nullptr;
+      }
+      else if(read.tag != TAG_JOIN){
+        Message msg(TAG_ERR, "Invalid tag\n");
+        if(!new_arg->connect->send(msg)){
+          delete new_arg->connect;
+          free(arg);
+          return nullptr;
+        }
+      }
     }
-    else if(new_arg->connect->get_last_result() == Connection::EOF_OR_ERROR){
-      delete new_arg->connect;
-      free(arg);
-      return nullptr;
-    }
-    else if(read.tag != TAG_JOIN){
-      Message msg(TAG_ERR, "Invalid tag\n");
-      new_arg->connect->send(msg);
-      delete new_arg->connect;
-      free(arg);
-      return nullptr;
-    }
-    else {
-      std::string room_name = read.data;
-      read = Message(TAG_OK, "You joined " + room_name);
-      new_arg->connect->send(read);
-      (new_arg->server->find_or_create_room(room_name))->add_member(user);
+    
+    std::string room_name = read.data;
+    read = Message(TAG_OK, "You joined " + room_name);
+    new_arg->connect->send(read);
+    (new_arg->server->find_or_create_room(room_name))->add_member(user);
 
+    receiver_comm(new_arg->connect, user, room_name);
 
-      receiver_comm(new_arg->connect, user, room_name);
-
-
-
-      (new_arg->server->find_or_create_room(room_name))->remove_member(user);
-      delete user;
-    }
+    (new_arg->server->find_or_create_room(room_name))->remove_member(user);
+    delete user;
+    
   }
   
   delete new_arg->connect;
