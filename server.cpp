@@ -213,6 +213,7 @@ void *worker(void *arg) {
           return nullptr;
         }
       }
+      new_arg->connect->receive(read);
     }
     
     std::string room_name = read.data;
