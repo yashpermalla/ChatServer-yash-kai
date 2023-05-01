@@ -22,6 +22,7 @@ public:
 
   void broadcast_message(const std::string &sender_username, const std::string &message_text);
 
+  // helper method to find whether a user is in a room
   bool in_room(User* user){
     return (members.find(user) != members.end());
   }
