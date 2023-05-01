@@ -67,7 +67,7 @@ bool Connection::receive(Message &msg) {
   // make sure that m_last_result is set appropriately
   char userbuf[msg.MAX_LEN + 1];
   ssize_t bytes = rio_readlineb(&m_fdbuf, (void *) userbuf, msg.MAX_LEN);
-  userbuf[bytes] = 0;
+  if(bytes >= 0) userbuf[bytes] = 0;
 
   // Must consist of char values
   if(bytes <= 0){
@@ -76,9 +76,9 @@ bool Connection::receive(Message &msg) {
   }
   else{
     std::string usrbf = std::string(userbuf);
-    size_t colonindex = usrbf.find(':');
+    size_t colonindex = usrbf.find(":");
     // Cannot find colon char value
-    if (colonindex == std::string::npos){
+    if (colonindex == std::string::npos || msg.datasize > (int) Message::MAX_LEN){
       m_last_result = INVALID_MSG;
       return false;
     }

@@ -2,6 +2,8 @@
 #define CONNECTION_H
 
 #include "csapp.h"
+#include <string>
+
 struct Message;
 
 class Connection {

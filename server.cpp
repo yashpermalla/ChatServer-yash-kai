@@ -37,23 +37,38 @@ void sender_comm(Connection* cn, Server* server, std::string username){
 
   Message msg;
   std::string room = "";
-  while(cn->receive(msg)){
-    
-    if(msg.tag == TAG_JOIN){
+  //cn->receive(msg) && cn->get_last_result() != Connection::EOF_OR_ERROR
+  while(1){
+    cn->receive(msg);
+    if(cn->get_last_result() == Connection::EOF_OR_ERROR) break;
+
+    if(cn->get_last_result() == Connection::INVALID_MSG){
+      msg.modify(TAG_ERR, "Invalid message\n");
+      if(!cn->send(msg)){
+        break;
+      }
+    }
+    else if(msg.tag == TAG_JOIN){
       room = msg.data;
       server->find_or_create_room(msg.data);
       msg.modify(TAG_OK, "joined\n");
-      cn->send(msg);
+      if(!cn->send(msg)){
+        break;
+      }
     }
     else if(msg.tag == TAG_LEAVE){
       if(room == ""){
         msg.modify(TAG_ERR, "you are not in a room!\n");
-        cn->send(msg);
+        if(!cn->send(msg)){
+          break;
+        }
       }
       else{
         room = "";
         msg.modify(TAG_OK, "left room!\n");
-        cn->send(msg);
+        if(!cn->send(msg)){
+          break;
+        }
       }
     }
     else if(msg.tag == TAG_QUIT){
@@ -65,13 +80,17 @@ void sender_comm(Connection* cn, Server* server, std::string username){
     else if(msg.tag == TAG_SENDALL){
       if(room == ""){
         msg.modify(TAG_ERR, "you are not in a room!\n");
-        cn->send(msg);
+        if(!cn->send(msg)){
+          break;
+        }
       }
       else{
 
         server->find_or_create_room(room)->broadcast_message(username, msg.data);
         msg.modify(TAG_OK, "sent!\n");
-        cn->send(msg);
+        if(!cn->send(msg)){
+          break;
+        }
       }
     }
   }
@@ -112,11 +131,41 @@ void *worker(void *arg) {
   Message read;
   new_arg->connect->receive(read);
 
+  while(read.tag != TAG_SLOGIN && read.tag != TAG_RLOGIN){
+    if(new_arg->connect->get_last_result() == Connection::INVALID_MSG){
+      Message msg(TAG_ERR, "Invalid message\n");
+      if(!new_arg->connect->send(msg)){
+        delete new_arg->connect;
+        free(arg);
+        return nullptr;  
+      }
+    }
+    else if(new_arg->connect->get_last_result() == Connection::EOF_OR_ERROR){
+      delete new_arg->connect;
+      free(arg);
+      return nullptr;
+    }
+    else if(read.tag != TAG_SLOGIN && read.tag != TAG_RLOGIN){
+      Message msg(TAG_ERR, "Invalid tag\n");
+      if(!new_arg->connect->send(msg)){
+        delete new_arg->connect;
+        free(arg);
+        return nullptr;  
+      }
+    }
+    new_arg->connect->receive(read);
+  }
+
+
   bool sender = (read.tag == TAG_SLOGIN);
   std::string username = read.data;
 
   read.modify(TAG_OK, "logged in\n");
-  new_arg->connect->send(read);
+  if(!new_arg->connect->send(read)){
+    delete new_arg->connect;
+    free(arg);
+    return nullptr;
+  }
 
   
   
@@ -137,7 +186,28 @@ void *worker(void *arg) {
      
 
     new_arg->connect->receive(read);
-    if (read.tag == TAG_JOIN) {
+
+    if(new_arg->connect->get_last_result() == Connection::INVALID_MSG){
+      Message msg(TAG_ERR, "Invalid message\n");
+      new_arg->connect->send(msg);
+      delete new_arg->connect;
+      free(arg);
+      return nullptr;
+      
+    }
+    else if(new_arg->connect->get_last_result() == Connection::EOF_OR_ERROR){
+      delete new_arg->connect;
+      free(arg);
+      return nullptr;
+    }
+    else if(read.tag != TAG_JOIN){
+      Message msg(TAG_ERR, "Invalid tag\n");
+      new_arg->connect->send(msg);
+      delete new_arg->connect;
+      free(arg);
+      return nullptr;
+    }
+    else {
       std::string room_name = read.data;
       read = Message(TAG_OK, "You joined " + room_name);
       new_arg->connect->send(read);
