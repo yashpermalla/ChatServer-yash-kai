@@ -151,7 +151,7 @@ namespace {
         free(arg);
         return nullptr;
       } 
-      else if(read.tag != TAG_SLOGIN && read.tag != TAG_RLOGIN){
+      else {
         Message msg(TAG_ERR, "Invalid tag\n");
         if(!new_arg->connect->send(msg)){
           delete new_arg->connect;
@@ -201,7 +201,7 @@ namespace {
           free(arg);
           return nullptr;
         } 
-        else if(read.tag != TAG_JOIN){
+        else {
           Message msg(TAG_ERR, "Invalid tag\n");
           if(!new_arg->connect->send(msg)){
             delete new_arg->connect;
